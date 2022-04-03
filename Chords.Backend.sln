@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chords.WebApi", "Chords.WebApi\Chords.WebApi.csproj", "{5B5A497F-DA16-4CB7-842D-E9A82B01A705}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chords.DataAccess", "Chords.DataAccess\Chords.DataAccess.csproj", "{92BB917C-288F-47FB-BB0F-3D2D1C2DE254}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chords.CoreLib", "Chords.CoreLib\Chords.CoreLib.csproj", "{B4772C59-AF9E-4846-A43F-B9D07BC9BB78}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B5A497F-DA16-4CB7-842D-E9A82B01A705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B5A497F-DA16-4CB7-842D-E9A82B01A705}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B5A497F-DA16-4CB7-842D-E9A82B01A705}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B5A497F-DA16-4CB7-842D-E9A82B01A705}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92BB917C-288F-47FB-BB0F-3D2D1C2DE254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92BB917C-288F-47FB-BB0F-3D2D1C2DE254}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92BB917C-288F-47FB-BB0F-3D2D1C2DE254}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92BB917C-288F-47FB-BB0F-3D2D1C2DE254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4772C59-AF9E-4846-A43F-B9D07BC9BB78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4772C59-AF9E-4846-A43F-B9D07BC9BB78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4772C59-AF9E-4846-A43F-B9D07BC9BB78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4772C59-AF9E-4846-A43F-B9D07BC9BB78}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
