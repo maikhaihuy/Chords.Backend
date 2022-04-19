@@ -11,6 +11,7 @@ using Chords.Web.GraphQl.Auth;
 using Chords.WebApi.Extensions;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
+using Chords.WebApi.GraphQl.Genres;
 using HotChocolate;
 using HotChocolate.Data;
 using Microsoft.AspNetCore.Http;
@@ -22,13 +23,11 @@ namespace Chords.WebApi.GraphQl._Actions
     {
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IAuthService _authService;
+        
         public Mutation([Service] IHttpContextAccessor contextAccessor,
-            [Service] IAuthService authService,
             IMapper mapper)
         {
             _mapper = mapper;
-            _authService = authService;
             _contextAccessor = contextAccessor;
         }
 
@@ -36,22 +35,52 @@ namespace Chords.WebApi.GraphQl._Actions
         
         public async Task<Token> Login(
             LoginInput input,
+            AuthService authService,
             CancellationToken cancellationToken)
         {
-            Token token = await _authService.Login(input);
+            Token token = await authService.Login(input);
             return token;
         }
         
         public async Task<Token> Register(
             RegisterInput input,
+            AuthService authService,
             CancellationToken cancellationToken)
         {
-            Token token = await _authService.Register(input);
+            Token token = await authService.Register(input);
             return token;
         }
         
         #endregion
 
+        #region Genre
+
+        public Task<Genre> AddGenre(
+            AddGenreInput input,
+            GenreService genreService
+        )
+        {
+            return genreService.CreateGenre(input);
+        }
+        
+        public Task<Genre> EditGenre(
+            EditGenreInput input,
+            GenreService genreService
+        )
+        {
+            return genreService.UpdateGenre(input);
+        }
+        
+        public Task<Genre> RemoveGenre(
+            string id,
+            GenreService genreService
+        )
+        {
+            return genreService.RemoveGenre(id);
+        }
+        
+        #endregion
+        
         // #region Artist
         //
         // [UseDbContext(typeof(ChordsDbContext))]
@@ -108,13 +137,5 @@ namespace Chords.WebApi.GraphQl._Actions
         // }
         //
         // #endregion
-
-        private string GetCurrentUser()
-        {
-            string userId = "Anonymous";
-            if (_contextAccessor.HttpContext != null)
-                userId = _contextAccessor.HttpContext.User.Id();
-            return userId;
-        }
     }
 }

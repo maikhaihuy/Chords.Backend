@@ -7,6 +7,7 @@ using Chords.CoreLib.HelperService.Auth;
 using Chords.DataAccess.EntityFramework;
 using Chords.WebApi.Configurations;
 using Chords.WebApi.GraphQl.Auth;
+using Chords.WebApi.GraphQl.Genres;
 using GraphQL.Server.Ui.Voyager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -56,11 +57,14 @@ namespace Chords.WebApi
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IJwtManagerConfiguration, JwtManagerConfiguration>();
             services.AddTransient<IJwtManagerService, JwtManagerService>();
-            services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<AuthService>();
+            services.AddTransient<GenreService>();
+            
+            services.AddAuthentication(AppSettings);
             
             // GraphQL config
             services.AddGraphQL(AppSettings);
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Chords.WebApi", Version = "v1"});
@@ -81,6 +85,7 @@ namespace Chords.WebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

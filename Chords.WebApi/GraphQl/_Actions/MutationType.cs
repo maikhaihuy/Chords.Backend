@@ -8,8 +8,15 @@ namespace Chords.WebApi.GraphQl._Actions
         {
             descriptor.BindFieldsExplicitly();
             
-            descriptor.Field(_ => _.Login(default, default));
-            descriptor.Field(_ => _.Register(default, default));
+            descriptor.Field(_ => _.Login(default, default, default));
+            descriptor.Field(_ => _.Register(default, default, default));
+
+            descriptor.Field(_ => _.AddGenre(default, default))
+                .Authorize();
+            descriptor.Field(_ => _.EditGenre(default, default))
+                .Authorize();
+            descriptor.Field(_ => _.RemoveGenre(default, default))
+                .Authorize();
         }
     }
 }

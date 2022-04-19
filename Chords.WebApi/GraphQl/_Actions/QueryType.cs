@@ -8,8 +8,14 @@ namespace Chords.WebApi.GraphQl._Actions
         protected override void Configure(IObjectTypeDescriptor<Query> descriptor)
         {
             descriptor.BindFieldsExplicitly();
-            descriptor.Field(_ => _.GetArtists(default))
-                .Type<ListType<ArtistType>>();
+            
+            descriptor.Field(_ => _.GetGenres(default))
+                .Type<ListType<ArtistType>>()
+                .Authorize();
+            
+            descriptor.Field(_ => _.GetGenre(default, default))
+                .Type<ArtistType>()
+                .Authorize();
         }
     }
 }

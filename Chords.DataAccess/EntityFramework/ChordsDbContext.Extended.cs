@@ -44,7 +44,19 @@ namespace Chords.DataAccess.EntityFramework
             PopulateGuidField(entity);
             return base.Add(entity);
         }
+
+        public override void AddRange(params object[] entities)
+        {
+            IEnumerable<object> enumerable = entities.Select(PopulateGuidField);
+            base.AddRange(enumerable);
+        }
         
+        public override void AddRange(IEnumerable<object> entities)
+        {
+            IEnumerable<object> enumerable = entities.Select(PopulateGuidField);
+            base.AddRange(enumerable);
+        }
+
         public override ValueTask<EntityEntry> AddAsync(object entity,
             CancellationToken cancellationToken = new CancellationToken())
         {
@@ -57,6 +69,18 @@ namespace Chords.DataAccess.EntityFramework
         {
             PopulateGuidField(entity);
             return base.AddAsync(entity, cancellationToken);
+        }
+
+        public override Task AddRangeAsync(IEnumerable<object> entities, CancellationToken cancellationToken = new CancellationToken())
+        {
+            IEnumerable<object> enumerable = entities.Select(PopulateGuidField);
+            return base.AddRangeAsync(enumerable, cancellationToken);
+        }
+
+        public override Task AddRangeAsync(params object[] entities)
+        {
+            IEnumerable<object> enumerable = entities.Select(PopulateGuidField);
+            return base.AddRangeAsync(enumerable);
         }
 
         #endregion
@@ -174,7 +198,7 @@ namespace Chords.DataAccess.EntityFramework
             // }
         }
 
-        private void PopulateGuidField(object entry)
+        private object PopulateGuidField(object entry)
         {
             PropertyInfo primaryKey = entry.GetType().GetProperties().FirstOrDefault(_ => _.Name == PrimaryKeyName);
             if (primaryKey == null)
@@ -184,6 +208,7 @@ namespace Chords.DataAccess.EntityFramework
             
             string guid = Guid.NewGuid().ToString();
             primaryKey.SetValue(entry, guid, null);
+            return entry;
         }
         
         private void PopulateAuditFields(EntityEntry entry)

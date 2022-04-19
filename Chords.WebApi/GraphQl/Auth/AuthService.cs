@@ -1,8 +1,7 @@
+
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Chords.CoreLib.HelperService.Auth;
@@ -10,104 +9,87 @@ using Chords.CoreLib.Utils;
 using Chords.DataAccess.EntityFramework;
 using Chords.DataAccess.Models;
 using Chords.Web.GraphQl.Auth;
+using Chords.WebApi.Common;
 using Chords.WebApi.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService : BaseService
     {
         private readonly IMapper _mapper;
         private readonly IJwtManagerService _jwtManagerService;
-        private readonly IDbContextFactory<ChordsDbContext> _dbContextFactory;
+        private readonly ChordsDbContext _dbContext;
         
-        public AuthService(IMapper mapper, IDbContextFactory<ChordsDbContext> dbContextFactory,
-            IJwtManagerService jwtManagerService)
+        public AuthService(IMapper mapper, IHttpContextAccessor httpContextAccessor, IDbContextFactory<ChordsDbContext> dbContextFactory,
+            IJwtManagerService jwtManagerService) : base(httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
             _jwtManagerService = jwtManagerService;
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContextFactory.CreateDbContext();
         }
 
         public async Task<Token> Login(LoginInput loginInput)
         {
-            try
+            Account account = _dbContext.Accounts.FirstOrDefault(_ => _.Email == loginInput.Email);
+            if (account == null || !CryptoHelpers.VerifyPassword(loginInput.Password, account.Password))
             {
-                await using var dbContext = _dbContextFactory.CreateDbContext();
-                
-                Account account = dbContext.Accounts.FirstOrDefault(_ => _.Email == loginInput.Email);
-                if (account == null || CryptoHelpers.VerifyPassword(loginInput.Password, account.Password))
-                {
-                    throw new Exception("Invalid credentials. Email or password is not correct.");
-                }
+                throw new Exception("Invalid credentials. Email or password is not correct.");
+            }
 
-                ClaimsIdentity claimsIdentity = AuthHelpers.ArchiveCurrentUser(account);
-                string accessToken = _jwtManagerService.GenerateAccessToken(claimsIdentity);
-                string refreshToken = _jwtManagerService.GenerateRefreshToken();
-                Token token = new Token
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken,
-                    UserId = account.Id
-                };
-                
-                account.Tokens.Add(token);
-                
-                await dbContext.SaveChangesAsync();
-                
-                return token;
-            }
-            catch (Exception exception)
+            ClaimsIdentity claimsIdentity = AuthHelpers.ArchiveCurrentUser(account);
+            string accessToken = _jwtManagerService.GenerateAccessToken(claimsIdentity);
+            string refreshToken = _jwtManagerService.GenerateRefreshToken();
+            Token token = new Token
             {
-                throw exception;
-            }
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                UserId = account.Id
+            };
+            _dbContext.Add(token);
+            
+            account.Tokens.Add(token);
+            
+            await _dbContext.SaveChangesAsync();
+            
+            return token;
         }
 
         public async Task<Token> Register(RegisterInput registerInput)
         {
-            try
+            Account account = _dbContext.Accounts.FirstOrDefault(_ => _.Email == registerInput.Email);
+            if (account != null)
             {
-                await using var dbContext = _dbContextFactory.CreateDbContext();
-                
-                Account account = dbContext.Accounts.FirstOrDefault(_ => _.Email == registerInput.Email);
-                if (account != null)
-                {
-                    throw new Exception("Email already exists.");
-                }
-                
-                account = new Account
-                {
-                    Email = registerInput.Email,
-                    Password = CryptoHelpers.PasswordHash(registerInput.Password),
-                    Username = registerInput.Name
-                };
-
-                dbContext.Add(account);
-                
-                ClaimsIdentity claimsIdentity = AuthHelpers.ArchiveCurrentUser(account);
-                string accessToken = _jwtManagerService.GenerateAccessToken(claimsIdentity);
-                string refreshToken = _jwtManagerService.GenerateRefreshToken();
-                Token token = new Token
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken,
-                    UserId = account.Id
-                };
-                dbContext.Add(token);
-                
-                account.Tokens.Add(token);
-                
-                await dbContext.SaveChangesAsync();
+                throw new Exception("Email already exists.");
+            }
             
-                return token;
-            }
-            catch (Exception exception)
+            account = new Account
             {
-                throw exception;
-            }
+                Email = registerInput.Email,
+                Password = CryptoHelpers.PasswordHash(registerInput.Password),
+                Username = registerInput.Name
+            };
+            
+            _dbContext.Add(account);
+                
+            ClaimsIdentity claimsIdentity = AuthHelpers.ArchiveCurrentUser(account);
+            string accessToken = _jwtManagerService.GenerateAccessToken(claimsIdentity);
+            string refreshToken = _jwtManagerService.GenerateRefreshToken();
+            Token token = new Token
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                UserId = account.Id
+            };
+            _dbContext.Add(token);
+                
+            account.Tokens.Add(token);
+                
+            await _dbContext.SaveChangesAsync();
+            
+            return token;
         }
-        
-        
     }
 
 }

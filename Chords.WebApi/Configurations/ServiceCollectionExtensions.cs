@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 using Chords.WebApi.GraphQl._Actions;
+using Chords.WebApi.GraphQl.Auth;
+using Chords.WebApi.GraphQl.Genres;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -61,6 +63,8 @@ namespace Chords.WebApi.Configurations
                 .AddGraphQLServer()
                 // .AddFairyBread()
                 .AddAuthorization()
+                .RegisterService<AuthService>()
+                .RegisterService<GenreService>()
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddFiltering()
