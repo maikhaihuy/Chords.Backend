@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,33 +7,33 @@ using Chords.WebApi.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chords.WebApi.GraphQl.Genres
+namespace Chords.WebApi.GraphQl.Performances
 {
-    public class GenreService : BaseService
+    public class PerformanceService : BaseService
     {
         private readonly IMapper _mapper;
-
-        public GenreService(IMapper mapper,
+        
+        public PerformanceService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
         }
         
-        public Task<IQueryable<Genre>> GetGenres()
+        public Task<IQueryable<Performance>> GetPerformances()
         {
-            return Task.FromResult(DbContext.Genres.AsQueryable());
+            return Task.FromResult(DbContext.Performances.AsQueryable());
         }
         
-        public Task<Genre> GetGenre(object id)
+        public Task<Performance> GetPerformance(object id)
         {
-            return Task.FromResult(DbContext.Genres.Find(id));
+            return Task.FromResult(DbContext.Performances.Find(id));
         }
 
-        public async Task<Genre> CreateGenre(AddGenreInput addGenreInput)
+        public async Task<Performance> CreatePerformance(AddPerformanceInput addPerformanceInput)
         {
-            Genre genre = _mapper.Map<Genre>(addGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Performance genre = _mapper.Map<Performance>(addPerformanceInput);
+            genre.UpdatedBy = CurrentUserId;
             
             var entityEntry = await DbContext.AddAsync(genre);
 
@@ -43,10 +42,10 @@ namespace Chords.WebApi.GraphQl.Genres
             return entityEntry.Entity;
         }
 
-        public async Task<Genre> UpdateGenre(EditGenreInput editGenreInput)
+        public async Task<Performance> UpdatePerformance(EditPerformanceInput editPerformanceInput)
         {
-            Genre genre = _mapper.Map<Genre>(editGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Performance genre = _mapper.Map<Performance>(editPerformanceInput);
+            genre.UpdatedBy = CurrentUserId;
             
             var entityEntry = DbContext.Update(genre);
 
@@ -55,13 +54,13 @@ namespace Chords.WebApi.GraphQl.Genres
             return entityEntry.Entity;
         }
 
-        public async Task<Genre> RemoveGenre(object id)
+        public async Task<Performance> RemovePerformance(object id)
         {
-            Genre genre = new Genre
+            Performance genre = new Performance
             {
                 Id = $"{id}",
                 IsDeleted = true,
-                UpdatedBy = GetCurrentUserId()
+                UpdatedBy = CurrentUserId
             };
 
             var entityEntry = DbContext.Remove(genre);

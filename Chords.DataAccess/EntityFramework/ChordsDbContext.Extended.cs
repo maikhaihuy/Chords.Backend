@@ -178,20 +178,20 @@ namespace Chords.DataAccess.EntityFramework
 
         private void OnBeforeSaveChanges()
         {
-            // ChangeTracker.DetectChanges();
-            //
-            // var modifiedEntries = ChangeTracker.Entries();
+            ChangeTracker.DetectChanges();
+            
+            var modifiedEntries = ChangeTracker.Entries();
             // List<AuditLog> auditLogs = new List<AuditLog>();
-            //
-            // foreach (var entry in modifiedEntries)
-            // {
-            //     PopulateAuditFields(entry);
-            //     
-            //     AuditLog auditLog = TrackingAuditLogs(entry);
-            //     if (auditLog != null)
-            //         auditLogs.Add(auditLog);
-            // }
-            //
+            
+            foreach (var entry in modifiedEntries)
+            {
+                PopulateAuditFields(entry);
+                
+                // AuditLog auditLog = TrackingAuditLogs(entry);
+                // if (auditLog != null)
+                //     auditLogs.Add(auditLog);
+            }
+            
             // if (auditLogs.Count > 0)
             // {
             //     AuditLogs.AddRange(auditLogs);
@@ -205,6 +205,9 @@ namespace Chords.DataAccess.EntityFramework
             {
                 throw new Exception($"Primary key of {entry.GetType()} not found.");
             }
+
+            if (primaryKey.GetValue(entry) != null)
+                return entry;
             
             string guid = Guid.NewGuid().ToString();
             primaryKey.SetValue(entry, guid, null);

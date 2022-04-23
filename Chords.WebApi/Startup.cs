@@ -6,8 +6,11 @@ using AutoMapper;
 using Chords.CoreLib.HelperService.Auth;
 using Chords.DataAccess.EntityFramework;
 using Chords.WebApi.Configurations;
+using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Genres;
+using Chords.WebApi.GraphQl.Performances;
+using Chords.WebApi.GraphQl.Songs;
 using GraphQL.Server.Ui.Voyager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +39,7 @@ namespace Chords.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AppSettings = Configuration.ConfigureAndGet<AppSettings>(services, AppSettings.SectionName);
+            AppSettings = Configuration.ConfigureAndGet<AppSettings>(services);
             
             services.AddControllers();
             
@@ -54,12 +57,15 @@ namespace Chords.WebApi
             }).CreateMapper());
             
             // DI services
+            services.AddTransient<AuthService>();
+            services.AddTransient<ArtistService>();
+            services.AddTransient<GenreService>();
+            services.AddTransient<PerformanceService>();
+            services.AddTransient<SongService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IJwtManagerConfiguration, JwtManagerConfiguration>();
             services.AddTransient<IJwtManagerService, JwtManagerService>();
-            services.AddTransient<AuthService>();
-            services.AddTransient<GenreService>();
-            
+
             services.AddAuthentication(AppSettings);
             
             // GraphQL config

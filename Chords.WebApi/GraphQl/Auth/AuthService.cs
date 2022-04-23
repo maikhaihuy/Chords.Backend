@@ -20,19 +20,17 @@ namespace Chords.WebApi.GraphQl.Auth
     {
         private readonly IMapper _mapper;
         private readonly IJwtManagerService _jwtManagerService;
-        private readonly ChordsDbContext _dbContext;
-        
+
         public AuthService(IMapper mapper, IHttpContextAccessor httpContextAccessor, IDbContextFactory<ChordsDbContext> dbContextFactory,
             IJwtManagerService jwtManagerService) : base(httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
             _jwtManagerService = jwtManagerService;
-            _dbContext = dbContextFactory.CreateDbContext();
         }
 
         public async Task<Token> Login(LoginInput loginInput)
         {
-            Account account = _dbContext.Accounts.FirstOrDefault(_ => _.Email == loginInput.Email);
+            Account account = DbContext.Accounts.FirstOrDefault(_ => _.Email == loginInput.Email);
             if (account == null || !CryptoHelpers.VerifyPassword(loginInput.Password, account.Password))
             {
                 throw new Exception("Invalid credentials. Email or password is not correct.");
@@ -47,18 +45,18 @@ namespace Chords.WebApi.GraphQl.Auth
                 RefreshToken = refreshToken,
                 UserId = account.Id
             };
-            _dbContext.Add(token);
+            DbContext.Add(token);
             
             account.Tokens.Add(token);
             
-            await _dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
             
             return token;
         }
 
         public async Task<Token> Register(RegisterInput registerInput)
         {
-            Account account = _dbContext.Accounts.FirstOrDefault(_ => _.Email == registerInput.Email);
+            Account account = DbContext.Accounts.FirstOrDefault(_ => _.Email == registerInput.Email);
             if (account != null)
             {
                 throw new Exception("Email already exists.");
@@ -71,7 +69,7 @@ namespace Chords.WebApi.GraphQl.Auth
                 Username = registerInput.Name
             };
             
-            _dbContext.Add(account);
+            DbContext.Add(account);
                 
             ClaimsIdentity claimsIdentity = AuthHelpers.ArchiveCurrentUser(account);
             string accessToken = _jwtManagerService.GenerateAccessToken(claimsIdentity);
@@ -82,11 +80,11 @@ namespace Chords.WebApi.GraphQl.Auth
                 RefreshToken = refreshToken,
                 UserId = account.Id
             };
-            _dbContext.Add(token);
+            DbContext.Add(token);
                 
             account.Tokens.Add(token);
                 
-            await _dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
             
             return token;
         }

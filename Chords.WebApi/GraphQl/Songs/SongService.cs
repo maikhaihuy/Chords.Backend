@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,33 +7,32 @@ using Chords.WebApi.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chords.WebApi.GraphQl.Genres
+namespace Chords.WebApi.GraphQl.Songs
 {
-    public class GenreService : BaseService
+    public class SongService : BaseService
     {
         private readonly IMapper _mapper;
-
-        public GenreService(IMapper mapper,
+        
+        public SongService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
         {
-            _mapper = mapper;
         }
         
-        public Task<IQueryable<Genre>> GetGenres()
+        public Task<IQueryable<Song>> GetSongs()
         {
-            return Task.FromResult(DbContext.Genres.AsQueryable());
+            return Task.FromResult(DbContext.Songs.AsQueryable());
         }
         
-        public Task<Genre> GetGenre(object id)
+        public Task<Song> GetSong(object id)
         {
-            return Task.FromResult(DbContext.Genres.Find(id));
+            return Task.FromResult(DbContext.Songs.Find(id));
         }
 
-        public async Task<Genre> CreateGenre(AddGenreInput addGenreInput)
+        public async Task<Song> CreateSong(AddSongInput addSongInput)
         {
-            Genre genre = _mapper.Map<Genre>(addGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Song genre = _mapper.Map<Song>(addSongInput);
+            genre.UpdatedBy = CurrentUserId;
             
             var entityEntry = await DbContext.AddAsync(genre);
 
@@ -43,10 +41,10 @@ namespace Chords.WebApi.GraphQl.Genres
             return entityEntry.Entity;
         }
 
-        public async Task<Genre> UpdateGenre(EditGenreInput editGenreInput)
+        public async Task<Song> UpdateSong(EditSongInput editSongInput)
         {
-            Genre genre = _mapper.Map<Genre>(editGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Song genre = _mapper.Map<Song>(editSongInput);
+            genre.UpdatedBy = CurrentUserId;
             
             var entityEntry = DbContext.Update(genre);
 
@@ -55,13 +53,13 @@ namespace Chords.WebApi.GraphQl.Genres
             return entityEntry.Entity;
         }
 
-        public async Task<Genre> RemoveGenre(object id)
+        public async Task<Song> RemoveSong(object id)
         {
-            Genre genre = new Genre
+            Song genre = new Song
             {
                 Id = $"{id}",
                 IsDeleted = true,
-                UpdatedBy = GetCurrentUserId()
+                UpdatedBy = CurrentUserId
             };
 
             var entityEntry = DbContext.Remove(genre);
