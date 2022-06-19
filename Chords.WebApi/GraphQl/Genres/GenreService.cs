@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Genres
 {
-    public class GenreService : BaseService
+    public class GenreService : BaseService<Genre>
     {
         private readonly IMapper _mapper;
 
         public GenreService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
+            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(mapper, httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
         }
@@ -33,8 +33,7 @@ namespace Chords.WebApi.GraphQl.Genres
 
         public async Task<Genre> CreateGenre(AddGenreInput addGenreInput)
         {
-            Genre genre = _mapper.Map<Genre>(addGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Genre genre = await PreCreate(addGenreInput);
             
             var entityEntry = await DbContext.AddAsync(genre);
 
@@ -45,8 +44,7 @@ namespace Chords.WebApi.GraphQl.Genres
 
         public async Task<Genre> UpdateGenre(EditGenreInput editGenreInput)
         {
-            Genre genre = _mapper.Map<Genre>(editGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Genre genre = await PreUpdate(editGenreInput);
             
             var entityEntry = DbContext.Update(genre);
 
@@ -57,12 +55,7 @@ namespace Chords.WebApi.GraphQl.Genres
 
         public async Task<Genre> RemoveGenre(object id)
         {
-            Genre genre = new Genre
-            {
-                Id = $"{id}",
-                IsDeleted = true,
-                UpdatedBy = GetCurrentUserId()
-            };
+            Genre genre = await PreRemove(id);
 
             var entityEntry = DbContext.Remove(genre);
             

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Songs
 {
-    public class SongService : BaseService
+    public class SongService : BaseService<Song>
     {
         private readonly IMapper _mapper;
         
         public SongService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
+            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(mapper, httpContextAccessor, dbContextFactory)
         {
         }
         
@@ -28,11 +29,15 @@ namespace Chords.WebApi.GraphQl.Songs
         {
             return Task.FromResult(DbContext.Songs.Find(id));
         }
+        
+        public Task<IQueryable<Song>> GetSongByIds(IReadOnlyList<object> ids)
+        {
+            return Task.FromResult(DbContext.Songs.Where(_ => ids.Contains(_.Id)));
+        }
 
         public async Task<Song> CreateSong(AddSongInput addSongInput)
         {
-            Song genre = _mapper.Map<Song>(addSongInput);
-            genre.UpdatedBy = CurrentUserId;
+            Song genre = await PreCreate(addSongInput);
             
             var entityEntry = await DbContext.AddAsync(genre);
 
@@ -43,8 +48,7 @@ namespace Chords.WebApi.GraphQl.Songs
 
         public async Task<Song> UpdateSong(EditSongInput editSongInput)
         {
-            Song genre = _mapper.Map<Song>(editSongInput);
-            genre.UpdatedBy = CurrentUserId;
+            Song genre = await PreUpdate(editSongInput);
             
             var entityEntry = DbContext.Update(genre);
 
@@ -55,12 +59,7 @@ namespace Chords.WebApi.GraphQl.Songs
 
         public async Task<Song> RemoveSong(object id)
         {
-            Song genre = new Song
-            {
-                Id = $"{id}",
-                IsDeleted = true,
-                UpdatedBy = CurrentUserId
-            };
+            Song genre = await PreRemove(id);
 
             var entityEntry = DbContext.Remove(genre);
             

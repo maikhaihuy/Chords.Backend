@@ -16,5 +16,6 @@ namespace Chords.DataAccess.Models
         public string KeyTone { get; set; }
         public ICollection<Artist> Singers { get; set; }
         public string Url { get; set; }
+        public string SongId { get; set; }
     }
 }

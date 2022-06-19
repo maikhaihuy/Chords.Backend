@@ -1,7 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Chords.DataAccess.Models;
-using Chords.Web.GraphQl.Auth;
+using Chords.WebApi.GraphQl.Accounts;
+using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Genres;
@@ -32,6 +33,28 @@ namespace Chords.WebApi.GraphQl._Core
             return token;
         }
         
+        #endregion
+
+        #region Account
+
+        public Task<Account> AddAccount(
+            AddAccountInput input,
+            AccountService accountService,
+            CancellationToken cancellationToken
+        ) => accountService.CreateAccount(input);
+
+        public Task<Account> EditAccount(
+            EditAccountInput input,
+            AccountService accountService,
+            CancellationToken cancellationToken
+        ) => accountService.UpdateAccount(input);
+
+        public Task<Account> RemoveAccount(
+            string id,
+            AccountService accountService,
+            CancellationToken cancellationToken
+        ) => accountService.RemoveAccount(id);
+
         #endregion
 
         #region Artist

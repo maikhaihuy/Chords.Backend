@@ -1,17 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using HotChocolate.Types;
 
 namespace Chords.WebApi.GraphQl.Artists
 {
     public class EditArtistInput
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Avatar { get; set; }
+        [Required] public string Id { get; set; } = null!;
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public string? Avatar { get; set; }
         
-        public string SeoTitle { get; set; }
-        public string SeoDescription { get; set; }
-        public string SeoKeywords { get; set; }
+        public string? SeoTitle { get; set; }
+        public string? SeoDescription { get; set; }
+        public string? SeoKeywords { get; set; }
     }
 
     public class EditArtistInputType : InputObjectType<EditArtistInput>
@@ -27,6 +29,15 @@ namespace Chords.WebApi.GraphQl.Artists
             descriptor.Field(b => b.SeoKeywords).Type<StringType>();
             
             base.Configure(descriptor);
+        }
+    }
+    
+    public class EditArtistInputValidator : AbstractValidator<EditArtistInput>
+    {
+        public EditArtistInputValidator()
+        {
+            RuleFor(input => input.Id)
+                .NotEmpty();
         }
     }
 }

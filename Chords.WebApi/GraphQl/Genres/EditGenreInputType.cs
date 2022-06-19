@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using HotChocolate.Types;
 
 namespace Chords.WebApi.GraphQl.Genres
 {
     public class EditGenreInput
     {
-        public string Id { get; set; }
+        [Required]
+        public string Id { get; set; } = null!;
         public string Name { get; set; }
         public string Total { get; set; }
         public string Description { get; set; }
@@ -28,6 +31,15 @@ namespace Chords.WebApi.GraphQl.Genres
             descriptor.Field(b => b.SeoKeywords).Type<StringType>();
 
             base.Configure(descriptor);
+        }
+    }
+    
+    public class EditGenreInputValidator : AbstractValidator<EditGenreInput>
+    {
+        public EditGenreInputValidator()
+        {
+            RuleFor(input => input.Id)
+                .NotEmpty();
         }
     }
 }

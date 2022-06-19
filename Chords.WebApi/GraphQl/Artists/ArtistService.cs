@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,15 +10,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Artists
 {
-    public class ArtistService : BaseService
+    public class ArtistService : BaseService<Artist>
     {
-        private readonly IMapper _mapper;
-        
         public ArtistService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
+            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(mapper, httpContextAccessor, dbContextFactory)
         {
-            _mapper = mapper;
         }
         
         public Task<IQueryable<Artist>> GetArtists()
@@ -30,12 +28,26 @@ namespace Chords.WebApi.GraphQl.Artists
             return Task.FromResult(DbContext.Artists.Find(id));
         }
 
+        public Task<IQueryable<Artist>> GetArtistsByIds(IReadOnlyList<object> ids)
+        {
+            return Task.FromResult(DbContext.Artists.Where(_ => ids.Contains(_.Id)));
+        }
+
+        public Task<IQueryable<Artist>> GetArtistsByPerformanceIds(IReadOnlyList<object> performanceIds)
+        {
+            var artistsQueryable = DbContext.Performances.Where(_ => performanceIds.Contains(_.Id))
+                .Include(_ => _.Singers)
+                .SelectMany(_ => _.Singers)
+                .Distinct();
+            
+            return Task.FromResult(artistsQueryable);
+        }
+
         public async Task<Artist> CreateArtist(AddArtistInput addArtistInput)
         {
-            Artist genre = _mapper.Map<Artist>(addArtistInput);
-            genre.UpdatedBy = CurrentUserId;
+            Artist artist = await PreCreate(addArtistInput);
             
-            var entityEntry = await DbContext.AddAsync(genre);
+            var entityEntry = await DbContext.AddAsync(artist);
 
             await DbContext.SaveChangesAsync();
 
@@ -44,10 +56,9 @@ namespace Chords.WebApi.GraphQl.Artists
 
         public async Task<Artist> UpdateArtist(EditArtistInput editArtistInput)
         {
-            Artist genre = _mapper.Map<Artist>(editArtistInput);
-            genre.UpdatedBy = CurrentUserId;
-            
-            var entityEntry = DbContext.Update(genre);
+            Artist artist = await PreUpdate(editArtistInput);
+
+            var entityEntry = DbContext.Update(artist);
 
             await DbContext.SaveChangesAsync();
             
@@ -56,14 +67,9 @@ namespace Chords.WebApi.GraphQl.Artists
 
         public async Task<Artist> RemoveArtist(object id)
         {
-            Artist genre = new Artist
-            {
-                Id = $"{id}",
-                IsDeleted = true,
-                UpdatedBy = CurrentUserId
-            };
+            Artist artist = await PreRemove(id);
 
-            var entityEntry = DbContext.Remove(genre);
+            var entityEntry = DbContext.Remove(artist);
             
             await DbContext.SaveChangesAsync();
             

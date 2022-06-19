@@ -1,19 +1,18 @@
-
 using FluentValidation;
 using HotChocolate.Types;
 
-namespace Chords.WebApi.GraphQl.Auth
+namespace Chords.WebApi.GraphQl.Accounts
 {
-    public class RegisterInput
+    public class AddAccountInput
     {
         public string Email { get; set; }
         public string Password { get; set; }
-        public string Name { get; set; }
+        public string Username { get; set; }
     }
 
-    public class RegisterInputValidator : AbstractValidator<RegisterInput>
+    public class AddAccountInputValidator : AbstractValidator<AddAccountInput>
     {
-        public RegisterInputValidator()
+        public AddAccountInputValidator()
         {
             RuleFor(input => input.Email)
                 .NotEmpty()
@@ -23,19 +22,19 @@ namespace Chords.WebApi.GraphQl.Auth
                 .NotEmpty()
                 .WithMessage("The password is required.");
             
-            RuleFor(input => input.Name)
+            RuleFor(input => input.Username)
                 .NotEmpty()
-                .WithMessage("The name is required.");
+                .WithMessage("The Username is required.");
         }
     }
     
-    public class RegisterInputType : InputObjectType<RegisterInput>
+    public class AddAccountInputType : InputObjectType<AddAccountInput>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<RegisterInput> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<AddAccountInput> descriptor)
         {
             descriptor.Field(b => b.Email).Type<StringType>();
             descriptor.Field(b => b.Password).Type<StringType>();
-            descriptor.Field(b => b.Name).Type<StringType>();
+            descriptor.Field(b => b.Username).Type<StringType>();
         }
     }
 }

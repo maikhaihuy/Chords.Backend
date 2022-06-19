@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using HotChocolate.Types;
 
 namespace Chords.WebApi.GraphQl.Performances
 {
     public class EditPerformanceInput
     {
-        public string Id { get; set; }
+        [Required]
+        public string Id { get; set; } = null!;
         
         public string KeyTone { get; set; }
         public string Url { get; set; }
@@ -19,6 +22,15 @@ namespace Chords.WebApi.GraphQl.Performances
             descriptor.Field(b => b.Url).Type<StringType>();
 
             base.Configure(descriptor);
+        }
+    }
+    
+    public class EditPerformanceInputValidator : AbstractValidator<EditPerformanceInput>
+    {
+        public EditPerformanceInputValidator()
+        {
+            RuleFor(input => input.Id)
+                .NotEmpty();
         }
     }
 }

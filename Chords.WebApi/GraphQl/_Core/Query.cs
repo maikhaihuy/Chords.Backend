@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Chords.DataAccess.EntityFramework;
 using Chords.DataAccess.Models;
 using Chords.WebApi.Common;
+using Chords.WebApi.GraphQl.Accounts;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Genres;
 using Chords.WebApi.GraphQl.Performances;
@@ -17,6 +18,19 @@ namespace Chords.WebApi.GraphQl._Core
 {
     public class Query 
     {
+        #region Account
+        
+        [UseOffsetPaging(MaxPageSize = GraphQlConstants.MaxPageSize,
+            DefaultPageSize = GraphQlConstants.PageSize,
+            IncludeTotalCount = true)]
+        [UseFiltering]
+        [UseSorting]
+        public Task<IQueryable<Account>> GetAccounts(AccountService accountService) => accountService.GetAccounts();
+        
+        public Task<Account> GetAccount(AccountService accountService, string id) => accountService.GetAccount(id);
+        
+        #endregion
+        
         #region Artist
 
         [UseOffsetPaging(MaxPageSize = GraphQlConstants.MaxPageSize,

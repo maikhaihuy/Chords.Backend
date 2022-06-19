@@ -1,3 +1,4 @@
+using Chords.WebApi.GraphQl.Accounts;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Genres;
 using Chords.WebApi.GraphQl.Performances;
@@ -14,35 +15,43 @@ namespace Chords.WebApi.GraphQl._Core
             
             descriptor.Field(_ => _.GetArtists(default))
                 .Type<ListType<ArtistType>>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetArtist(default, default))
                 .Type<ArtistType>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetGenres(default))
                 .Type<ListType<GenreType>>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetGenre(default, default))
                 .Type<GenreType>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetPerformances(default))
                 .Type<ListType<PerformanceType>>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetPerformance(default, default))
                 .Type<PerformanceType>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetSongs(default))
                 .Type<ListType<SongType>>()
-                .Authorize();
+                .Authorize()
+                ;
             
             descriptor.Field(_ => _.GetSong(default, default))
                 .Type<SongType>()
-                .Authorize();
+                .Authorize()
+                ;
         }
     }
 }

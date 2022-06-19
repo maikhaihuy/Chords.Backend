@@ -3,6 +3,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FairyBread" Version="9.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.0.3" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="12.6.1" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.6.1" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.6.1" />
@@ -10,12 +12,12 @@
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="5.2.0" />
-    <PackageReference Include="FairyBread" Version="7.2.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GraphQl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chords.DataAccess\Chords.DataAccess.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\ErrorMessages" />
+    <Folder Include="ViewModels" />
   </ItemGroup>
 </Project>

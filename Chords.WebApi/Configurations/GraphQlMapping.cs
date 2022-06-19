@@ -4,6 +4,7 @@ using Chords.WebApi.GraphQl.Genres;
 using Chords.WebApi.GraphQl.Performances;
 using Chords.WebApi.GraphQl.Songs;
 using Chords.DataAccess.Models;
+using Chords.WebApi.GraphQl.Accounts;
 
 namespace Chords.WebApi.Configurations
 {
@@ -11,10 +12,17 @@ namespace Chords.WebApi.Configurations
     {
         public GraphQlMapping()
         {
+            AccountMapping();
             ArtistMapping();
             GenreMapping();
             PerformanceMapping();
             SongMapping();
+        }
+
+        public void AccountMapping()
+        {
+            CreateMap<AddAccountInput, Account>();
+            CreateMap<EditAccountInput, Account>();
         }
 
         public void ArtistMapping()

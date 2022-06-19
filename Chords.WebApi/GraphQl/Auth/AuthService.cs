@@ -8,7 +8,7 @@ using Chords.CoreLib.HelperService.Auth;
 using Chords.CoreLib.Utils;
 using Chords.DataAccess.EntityFramework;
 using Chords.DataAccess.Models;
-using Chords.Web.GraphQl.Auth;
+using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.Common;
 using Chords.WebApi.Helpers;
 using Microsoft.AspNetCore.Http;

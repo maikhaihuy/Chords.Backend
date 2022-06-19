@@ -89,28 +89,28 @@ namespace Chords.DataAccess.EntityFramework
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            TEntity entityDb = Find<TEntity>(keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
-
-            entityDb = ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // TEntity entityDb = Find<TEntity>(keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
+            //
+            // entityDb = ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
             
-            return base.Update(entityDb);
+            return base.Update(entity);
         }
 
         public override EntityEntry Update(object entity)
         {
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            object entityDb = Find(entity.GetType(), keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
-
-            ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // object entityDb = Find(entity.GetType(), keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
+            //
+            // ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
             
             return base.Update(entity);
         }
@@ -122,22 +122,22 @@ namespace Chords.DataAccess.EntityFramework
         public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)
         {
             EntityEntry<TEntity> result;
-            
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            TEntity entityDb = Find<TEntity>(keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
+            //
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // TEntity entityDb = Find<TEntity>(keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
 
-            if (entityDb is ISoftDeletedFields softDeletedEntity)
+            if (entity is ISoftDeletedFields softDeletedEntity)
             {
                 softDeletedEntity.IsDeleted = true;
-                result = base.Update(entityDb);
+                result = base.Update(entity);
             }
             else
             {
-                result = base.Remove(entityDb);
+                result = base.Remove(entity);
             }
             
             return result;

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Chords.WebApi.GraphQl._Core;
+using Chords.WebApi.GraphQl.Accounts;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Genres;
@@ -62,12 +63,14 @@ namespace Chords.WebApi.Configurations
         
         public static IServiceCollection AddGraphQL(this IServiceCollection services, AppSettings appSettings)
         {
+            services.AddValidatorsFromAssemblyContaining<LoginInputValidator>();
+            
             services
                 .AddGraphQLServer()
-                // .AddFairyBread()
+                .AddFairyBread()
                 .AddAuthorization()
                 .RegisterService<AuthService>()
-                
+                .RegisterService<AccountService>()
                 .RegisterService<GenreService>()
                 .RegisterService<ArtistService>()
                 .RegisterService<PerformanceService>()

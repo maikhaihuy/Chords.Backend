@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Performances
 {
-    public class PerformanceService : BaseService
+    public class PerformanceService : BaseService<Performance>
     {
         private readonly IMapper _mapper;
         
         public PerformanceService(IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
+            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(mapper, httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
         }
@@ -32,8 +32,7 @@ namespace Chords.WebApi.GraphQl.Performances
 
         public async Task<Performance> CreatePerformance(AddPerformanceInput addPerformanceInput)
         {
-            Performance genre = _mapper.Map<Performance>(addPerformanceInput);
-            genre.UpdatedBy = CurrentUserId;
+            Performance genre = await PreCreate(addPerformanceInput);
             
             var entityEntry = await DbContext.AddAsync(genre);
 
@@ -44,8 +43,7 @@ namespace Chords.WebApi.GraphQl.Performances
 
         public async Task<Performance> UpdatePerformance(EditPerformanceInput editPerformanceInput)
         {
-            Performance genre = _mapper.Map<Performance>(editPerformanceInput);
-            genre.UpdatedBy = CurrentUserId;
+            Performance genre = await PreUpdate(editPerformanceInput);
             
             var entityEntry = DbContext.Update(genre);
 
@@ -56,12 +54,7 @@ namespace Chords.WebApi.GraphQl.Performances
 
         public async Task<Performance> RemovePerformance(object id)
         {
-            Performance genre = new Performance
-            {
-                Id = $"{id}",
-                IsDeleted = true,
-                UpdatedBy = CurrentUserId
-            };
+            Performance genre = await PreRemove(id);
 
             var entityEntry = DbContext.Remove(genre);
             

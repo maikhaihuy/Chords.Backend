@@ -6,11 +6,13 @@ using AutoMapper;
 using Chords.CoreLib.HelperService.Auth;
 using Chords.DataAccess.EntityFramework;
 using Chords.WebApi.Configurations;
+using Chords.WebApi.GraphQl.Accounts;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Genres;
 using Chords.WebApi.GraphQl.Performances;
 using Chords.WebApi.GraphQl.Songs;
+using Chords.WebApi.Helpers;
 using GraphQL.Server.Ui.Voyager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -58,6 +60,7 @@ namespace Chords.WebApi
             
             // DI services
             services.AddTransient<AuthService>();
+            services.AddTransient<AccountService>();
             services.AddTransient<ArtistService>();
             services.AddTransient<GenreService>();
             services.AddTransient<PerformanceService>();
@@ -65,7 +68,8 @@ namespace Chords.WebApi
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IJwtManagerConfiguration, JwtManagerConfiguration>();
             services.AddTransient<IJwtManagerService, JwtManagerService>();
-
+            services.AddScoped<PredicateValidators>();
+            
             services.AddAuthentication(AppSettings);
             
             // GraphQL config
