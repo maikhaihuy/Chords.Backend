@@ -21,7 +21,7 @@ namespace Chords.WebApi.Common
 
         private async Task<T> FindAsync(object id)
         {
-            T? t = await DbContext.FindAsync<T>(id);
+            T t = await DbContext.FindAsync<T>(id);
             if (t == null) throw new ArgumentException($"[{typeof(T).Name}] [{id}] is not exists.");
             return t;
         }
@@ -44,7 +44,7 @@ namespace Chords.WebApi.Common
         {
             T tInput = MergeInput(input);
 
-            T tDb = await FindAsync(tInput);
+            T tDb = await FindAsync(tInput.Id);
             ReflectionHelpers.MergeFieldsChanged(tInput, tDb);
             
             return tDb;

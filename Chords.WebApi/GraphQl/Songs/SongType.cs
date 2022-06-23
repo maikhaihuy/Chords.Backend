@@ -1,5 +1,6 @@
 using Chords.WebApi.Common;
 using Chords.WebApi.GraphQl.Accounts;
+using Chords.WebApi.GraphQl.Genres;
 using HotChocolate.Types;
 using SongEntity = Chords.DataAccess.Models.Song;
 
@@ -24,10 +25,12 @@ namespace Chords.WebApi.GraphQl.Songs
             descriptor.Field(b => b.SeoTitle).Type<StringType>();
             descriptor.Field(b => b.SeoDescription).Type<StringType>();
             descriptor.Field(b => b.SeoKeywords).Type<StringType>();
-        
             // public ICollection<Artist> Authors { get; set; }
             // public ICollection<Performance> Performances { get; set; }
             // public Genre Genre { get; set; }
+            descriptor.Field(b => b.Genre)
+                .ResolveWith<SongResolver>(resolver => resolver.GetGenre(default, default))
+                .Type<GenreType>();
             descriptor.Field(FieldNameConstants.Creator)
                 .ResolveWith<AccountResolver>(resolver => resolver.GetCreator<SongEntity>(default, default));
             descriptor.Field(FieldNameConstants.Updater)

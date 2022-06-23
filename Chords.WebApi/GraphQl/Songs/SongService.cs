@@ -37,10 +37,18 @@ namespace Chords.WebApi.GraphQl.Songs
 
         public async Task<Song> CreateSong(AddSongInput addSongInput)
         {
-            Song genre = await PreCreate(addSongInput);
+            Song song = await PreCreate(addSongInput);
             
-            var entityEntry = await DbContext.AddAsync(genre);
+            // adding artist song
+            if (addSongInput.AuthorIds is {Length: > 0})
+            {
+                var artistIds = addSongInput.AuthorIds.Distinct().ToList();
+                List<Artist> artists = await DbContext.Artists.Where(_ => artistIds.Contains(_.Id)).ToListAsync();
+                if (artists.Count > 0) song.Authors = artists;
+            }
 
+            var entityEntry = await DbContext.AddAsync(song);
+            
             await DbContext.SaveChangesAsync();
 
             return entityEntry.Entity;
@@ -48,9 +56,17 @@ namespace Chords.WebApi.GraphQl.Songs
 
         public async Task<Song> UpdateSong(EditSongInput editSongInput)
         {
-            Song genre = await PreUpdate(editSongInput);
+            Song song = await PreUpdate(editSongInput);
             
-            var entityEntry = DbContext.Update(genre);
+            // update artist song
+            if (editSongInput.AuthorIds is {Length: > 0})
+            {
+                var artistIds = editSongInput.AuthorIds.Distinct().ToList();
+                List<Artist> artists = await DbContext.Artists.Where(_ => artistIds.Contains(_.Id)).ToListAsync();
+                if (artists.Count > 0) song.Authors = artists;
+            }
+            
+            var entityEntry = DbContext.Update(song);
 
             await DbContext.SaveChangesAsync();
             

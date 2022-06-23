@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -31,6 +32,11 @@ namespace Chords.WebApi.GraphQl.Genres
             return Task.FromResult(DbContext.Genres.Find(id));
         }
 
+        public Task<IQueryable<Genre>> GetGenresByIds(IReadOnlyList<object> ids)
+        {
+            return Task.FromResult(DbContext.Genres.Where(_ => ids.Contains(_.Id)));
+        }
+        
         public async Task<Genre> CreateGenre(AddGenreInput addGenreInput)
         {
             Genre genre = await PreCreate(addGenreInput);
