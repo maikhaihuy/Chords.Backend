@@ -35,6 +35,16 @@ namespace Chords.WebApi.GraphQl.Songs
             return Task.FromResult(DbContext.Songs.Where(_ => ids.Contains(_.Id)));
         }
 
+        public Task<List<Song>> GetAuthorsByIds(IReadOnlyList<object> songIds)
+        {
+            var songsIncludeAuthorsQueryable = DbContext.Songs
+                .Where(_ => songIds.Contains(_.Id))
+                .Include(_ => _.Authors)
+                .ToListAsync();
+
+            return songsIncludeAuthorsQueryable;
+        }
+        
         public async Task<Song> CreateSong(AddSongInput addSongInput)
         {
             Song song = await PreCreate(addSongInput);

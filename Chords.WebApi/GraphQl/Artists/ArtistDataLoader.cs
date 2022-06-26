@@ -36,4 +36,18 @@ namespace Chords.WebApi.GraphQl.Artists
     //         return result.ToLookup(_ => _.Performances.);
     //     }
     // }
+
+    public class AuthorForSongGroupDataLoader : GroupedDataLoader<string, Artist>
+    {
+        private ArtistService _artistService;
+        public AuthorForSongGroupDataLoader(ArtistService artistService, IBatchScheduler batchScheduler, DataLoaderOptions? options = null) : base(batchScheduler, options)
+        {
+            _artistService = artistService;
+        }
+
+        protected override Task<ILookup<string, Artist>> LoadGroupedBatchAsync(IReadOnlyList<string> keys, CancellationToken cancellationToken)
+        {
+            return _artistService.GetAuthorsBySongIds(keys);
+        }
+    }
 }
