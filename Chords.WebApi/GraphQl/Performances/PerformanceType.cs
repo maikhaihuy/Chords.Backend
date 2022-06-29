@@ -19,15 +19,15 @@ namespace Chords.WebApi.GraphQl.Performances
             descriptor.Field(b => b.Url).Type<StringType>();
             // public ICollection<Artist> Singers { get; set; }
             
+            descriptor.Field("song")
+                .ResolveWith<PerformanceResolver>(resolver => resolver.GetSong(default, default));
+            descriptor.Field(b => b.Singers)
+                .ResolveWith<PerformanceResolver>(resolver => resolver.GetSingers(default, default));
+            
             descriptor.Field(FieldNameConstants.Creator)
                 .ResolveWith<AccountResolver>(resolver => resolver.GetCreator<PerformanceEntity>(default, default));
             descriptor.Field(FieldNameConstants.Updater)
                 .ResolveWith<AccountResolver>(resolver => resolver.GetUpdater<PerformanceEntity>(default, default));
-
-            descriptor.Field("song")
-                .ResolveWith<PerformanceResolver>(resolver => resolver.GetSong(default, default));
-            // descriptor.Field(b => b.Singers)
-            //     .ResolveWith<PerformanceResolver>(resolver => resolver.GetSingers(default, default));
         }
     }
 }

@@ -15,9 +15,9 @@ namespace Chords.WebApi.GraphQl.Performances
             return dataLoader.LoadAsync(parent.SongId);
         }
 
-        // public Task<Artist[]> GetSingers([Parent] Performance parent, ArtistGroupDataLoader dataLoader)
-        // {
-        //     return dataLoader.LoadAsync(parent.Id);
-        // }
+        public Task<Artist[]> GetSingers([Parent] Performance parent, SingerForPerformanceGroupDataLoader dataLoader)
+        {
+            return dataLoader.LoadAsync(parent.Id);
+        }
     }
 }

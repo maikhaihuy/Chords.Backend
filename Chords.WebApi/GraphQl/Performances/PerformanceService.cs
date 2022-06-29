@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -30,6 +31,18 @@ namespace Chords.WebApi.GraphQl.Performances
             return Task.FromResult(DbContext.Performances.Find(id));
         }
 
+        public async Task<ILookup<string, Performance>> GetPerformancesBySongIds(IReadOnlyList<object> songIds)
+        {
+            var songsIncludePerformances = await DbContext.Songs
+                .Where(_ => songIds.Contains(_.Id))
+                .Include(_ => _.Performances)
+                .ToListAsync();
+            var performances = songsIncludePerformances
+                .SelectMany(_ => _.Performances.Select(__ => new {SongId = _.Id, Performance = __ }))
+                .ToLookup(pair => pair.SongId, pair => pair.Performance);
+            return performances;
+        }
+        
         public async Task<Performance> CreatePerformance(AddPerformanceInput addPerformanceInput)
         {
             Performance genre = await PreCreate(addPerformanceInput);

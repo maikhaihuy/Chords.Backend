@@ -55,6 +55,18 @@ namespace Chords.WebApi.GraphQl.Artists
             return authors;
         }
 
+        public async Task<ILookup<string, Artist>> GetSingersBySongIds(IReadOnlyList<object> songIds)
+        {
+            var songsIncludeAuthors = await DbContext.Songs
+                .Where(_ => songIds.Contains(_.Id))
+                .Include(_ => _.Authors)
+                .ToListAsync();
+            var authors = songsIncludeAuthors
+                .SelectMany(_ => _.Authors.Select(__ => new {SongId = _.Id, Author = __ }))
+                .ToLookup(pair => pair.SongId, pair => pair.Author);
+            return authors;
+        }
+
         public async Task<Artist> CreateArtist(AddArtistInput addArtistInput)
         {
             Artist artist = await PreCreate(addArtistInput);

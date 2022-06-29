@@ -31,12 +31,14 @@ namespace Chords.WebApi.GraphQl.Songs
             // public ICollection<Artist> Authors { get; set; }
             // public ICollection<Performance> Performances { get; set; }
             // public Genre Genre { get; set; }
+            descriptor.Field(b => b.Performances)
+                .ResolveWith<SongResolver>(resolver => resolver.GetPerformances(default, default));
             descriptor.Field(b => b.Authors)
-                .ResolveWith<SongResolver>(resolver => resolver.GetAuthors(default, default))
-                ;
+                .ResolveWith<SongResolver>(resolver => resolver.GetAuthors(default, default));
             descriptor.Field(b => b.Genre)
                 .ResolveWith<SongResolver>(resolver => resolver.GetGenre(default, default))
                 .Type<GenreType>();
+            
             descriptor.Field(FieldNameConstants.Creator)
                 .ResolveWith<AccountResolver>(resolver => resolver.GetCreator<SongEntity>(default, default));
             descriptor.Field(FieldNameConstants.Updater)

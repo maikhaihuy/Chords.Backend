@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Chords.DataAccess.Models;
 using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Genres;
+using Chords.WebApi.GraphQl.Performances;
 using HotChocolate;
 
 namespace Chords.WebApi.GraphQl.Songs
@@ -15,6 +16,11 @@ namespace Chords.WebApi.GraphQl.Songs
         }
 
         public Task<Artist[]> GetAuthors([Parent] Song parent, AuthorForSongGroupDataLoader groupDataLoader)
+        {
+            return groupDataLoader.LoadAsync(parent.Id);
+        }
+        
+        public Task<Performance[]> GetPerformances([Parent] Song parent, PerformanceForSongGroupDataLoader groupDataLoader)
         {
             return groupDataLoader.LoadAsync(parent.Id);
         }

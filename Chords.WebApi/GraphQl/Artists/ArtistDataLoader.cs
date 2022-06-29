@@ -22,20 +22,19 @@ namespace Chords.WebApi.GraphQl.Artists
         }
     }
 
-    // public class ArtistGroupDataLoader : GroupedDataLoader<string, Artist>
-    // {
-    //     private ArtistService _artistService;
-    //     public ArtistGroupDataLoader(ArtistService artistService, IBatchScheduler batchScheduler, DataLoaderOptions? options = null) : base(batchScheduler, options)
-    //     {
-    //         _artistService = artistService;
-    //     }
-    //
-    //     protected override async Task<ILookup<string, Artist>> LoadGroupedBatchAsync(IReadOnlyList<string> keys, CancellationToken cancellationToken)
-    //     {
-    //         var result = await _artistService.GetArtistsByPerformanceIds(keys);
-    //         return result.ToLookup(_ => _.Performances.);
-    //     }
-    // }
+    public class SingerForPerformanceGroupDataLoader : GroupedDataLoader<string, Artist>
+    {
+        private ArtistService _artistService;
+        public SingerForPerformanceGroupDataLoader(ArtistService artistService, IBatchScheduler batchScheduler, DataLoaderOptions? options = null) : base(batchScheduler, options)
+        {
+            _artistService = artistService;
+        }
+    
+        protected override async Task<ILookup<string, Artist>> LoadGroupedBatchAsync(IReadOnlyList<string> keys, CancellationToken cancellationToken)
+        {
+            return await _artistService.GetSingersBySongIds(keys);
+        }
+    }
 
     public class AuthorForSongGroupDataLoader : GroupedDataLoader<string, Artist>
     {
