@@ -1,3 +1,5 @@
+using Chords.WebApi.Common;
+using Chords.WebApi.GraphQl.Accounts;
 using HotChocolate.Types;
 using ArtistEntity = Chords.DataAccess.Models.Artist;
 
@@ -22,6 +24,11 @@ namespace Chords.WebApi.GraphQl.Artists
             
             // public ICollection<Song> Songs { get; set; }
             // public ICollection<Performance> Performances { get; set; }
+            
+            descriptor.Field(FieldNameConstants.Creator)
+                .ResolveWith<AccountResolver>(resolver => resolver.GetCreator<ArtistEntity>(default, default));
+            descriptor.Field(FieldNameConstants.Updater)
+                .ResolveWith<AccountResolver>(resolver => resolver.GetUpdater<ArtistEntity>(default, default));
         }
     }
 }

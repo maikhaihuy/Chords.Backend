@@ -10,20 +10,28 @@ namespace Chords.WebApi.Common
 {
     public class BaseService : IAsyncDisposable
     {
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ChordsDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        protected readonly ChordsDbContext DbContext;
+        
+        protected string CurrentUserId => GetCurrentUserId();
 
-        protected BaseService([Service] IHttpContextAccessor contextAccessor, IDbContextFactory<ChordsDbContext> dbContextFactory)
+        protected BaseService([Service] IHttpContextAccessor httpContextAccessor, IDbContextFactory<ChordsDbContext> dbContextFactory)
         {
-            _contextAccessor = contextAccessor;
-            _dbContext = dbContextFactory.CreateDbContext();
+            _httpContextAccessor = httpContextAccessor;
+            DbContext = dbContextFactory.CreateDbContext();
         }
 
-        protected string GetCurrentUserId() => _contextAccessor.HttpContext?.User.Id();
+        protected string GetCurrentUserId()
+        {
+            string userId = "Anonymous";
+            if (_httpContextAccessor.HttpContext != null)
+                userId = _httpContextAccessor.HttpContext.User.Id();
+            return userId;
+        }
 
         public ValueTask DisposeAsync()
         {
-            return _dbContext.DisposeAsync();
+            return DbContext.DisposeAsync();
         }
     }
 }

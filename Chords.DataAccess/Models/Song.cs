@@ -23,6 +23,7 @@ namespace Chords.DataAccess.Models
         public string SeoTitle { get; set; }
         public string SeoDescription { get; set; }
         public string SeoKeywords { get; set; }
+        public string GenreId { get; set; }
         
         public ICollection<Artist> Authors { get; set; }
         public ICollection<Performance> Performances { get; set; }

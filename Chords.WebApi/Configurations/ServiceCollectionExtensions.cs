@@ -1,8 +1,12 @@
 using System;
 using System.Text;
-using Chords.WebApi.GraphQl._Actions;
+using Chords.WebApi.GraphQl._Core;
+using Chords.WebApi.GraphQl.Accounts;
+using Chords.WebApi.GraphQl.Artists;
 using Chords.WebApi.GraphQl.Auth;
 using Chords.WebApi.GraphQl.Genres;
+using Chords.WebApi.GraphQl.Performances;
+using Chords.WebApi.GraphQl.Songs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -59,12 +63,18 @@ namespace Chords.WebApi.Configurations
         
         public static IServiceCollection AddGraphQL(this IServiceCollection services, AppSettings appSettings)
         {
+            services.AddValidatorsFromAssemblyContaining<LoginInputValidator>();
+            
             services
                 .AddGraphQLServer()
-                // .AddFairyBread()
+                .AddFairyBread()
                 .AddAuthorization()
                 .RegisterService<AuthService>()
+                .RegisterService<AccountService>()
                 .RegisterService<GenreService>()
+                .RegisterService<ArtistService>()
+                .RegisterService<PerformanceService>()
+                .RegisterService<SongService>()
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddFiltering()
@@ -85,6 +95,12 @@ namespace Chords.WebApi.Configurations
             services.Configure<T>(section);
 
             return section.Get<T>();
+        }
+        
+        public static T ConfigureAndGet<T>(
+            this IConfiguration configuration, IServiceCollection services) where T: class
+        {
+            return configuration.Get<T>();
         }
     }
 

@@ -1,16 +1,17 @@
+using FluentValidation;
 using HotChocolate.Types;
 
 namespace Chords.WebApi.GraphQl.Artists
 {
     public class AddArtistInput
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Avatar { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        public string? Avatar { get; set; }
         
-        public string SeoTitle { get; set; }
-        public string SeoDescription { get; set; }
-        public string SeoKeywords { get; set; }
+        public string? SeoTitle { get; set; }
+        public string? SeoDescription { get; set; }
+        public string? SeoKeywords { get; set; }
     }
 
     public class AddArtistInputType : InputObjectType<AddArtistInput>
@@ -25,6 +26,15 @@ namespace Chords.WebApi.GraphQl.Artists
             descriptor.Field(b => b.SeoKeywords).Type<StringType>();
             
             base.Configure(descriptor);
+        }
+    }
+
+    public class AddArtistInputValidator : AbstractValidator<AddArtistInput>
+    {
+        public AddArtistInputValidator()
+        {
+            RuleFor(input => input.Name)
+                .NotEmpty();
         }
     }
 }

@@ -89,28 +89,28 @@ namespace Chords.DataAccess.EntityFramework
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            TEntity entityDb = Find<TEntity>(keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
-
-            entityDb = ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // TEntity entityDb = Find<TEntity>(keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
+            //
+            // entityDb = ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
             
-            return base.Update(entityDb);
+            return base.Update(entity);
         }
 
         public override EntityEntry Update(object entity)
         {
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            object entityDb = Find(entity.GetType(), keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
-
-            ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // object entityDb = Find(entity.GetType(), keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
+            //
+            // ReflectionHelpers.MergeFieldsChanged(entity, entityDb);
             
             return base.Update(entity);
         }
@@ -122,22 +122,22 @@ namespace Chords.DataAccess.EntityFramework
         public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)
         {
             EntityEntry<TEntity> result;
-            
-            object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
-            TEntity entityDb = Find<TEntity>(keyValues);
-            if (entityDb == null)
-            {
-                throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
-            }
+            //
+            // object[] keyValues = ReflectionHelpers.GetKeyValues(entity);
+            // TEntity entityDb = Find<TEntity>(keyValues);
+            // if (entityDb == null)
+            // {
+            //     throw new Exception($"{entity.GetType()} not found with id: {keyValues}");
+            // }
 
-            if (entityDb is ISoftDeletedFields softDeletedEntity)
+            if (entity is ISoftDeletedFields softDeletedEntity)
             {
                 softDeletedEntity.IsDeleted = true;
-                result = base.Update(entityDb);
+                result = base.Update(entity);
             }
             else
             {
-                result = base.Remove(entityDb);
+                result = base.Remove(entity);
             }
             
             return result;
@@ -178,20 +178,20 @@ namespace Chords.DataAccess.EntityFramework
 
         private void OnBeforeSaveChanges()
         {
-            // ChangeTracker.DetectChanges();
-            //
-            // var modifiedEntries = ChangeTracker.Entries();
+            ChangeTracker.DetectChanges();
+            
+            var modifiedEntries = ChangeTracker.Entries();
             // List<AuditLog> auditLogs = new List<AuditLog>();
-            //
-            // foreach (var entry in modifiedEntries)
-            // {
-            //     PopulateAuditFields(entry);
-            //     
-            //     AuditLog auditLog = TrackingAuditLogs(entry);
-            //     if (auditLog != null)
-            //         auditLogs.Add(auditLog);
-            // }
-            //
+            
+            foreach (var entry in modifiedEntries)
+            {
+                PopulateAuditFields(entry);
+                
+                // AuditLog auditLog = TrackingAuditLogs(entry);
+                // if (auditLog != null)
+                //     auditLogs.Add(auditLog);
+            }
+            
             // if (auditLogs.Count > 0)
             // {
             //     AuditLogs.AddRange(auditLogs);
@@ -205,6 +205,9 @@ namespace Chords.DataAccess.EntityFramework
             {
                 throw new Exception($"Primary key of {entry.GetType()} not found.");
             }
+
+            if (primaryKey.GetValue(entry) != null)
+                return entry;
             
             string guid = Guid.NewGuid().ToString();
             primaryKey.SetValue(entry, guid, null);

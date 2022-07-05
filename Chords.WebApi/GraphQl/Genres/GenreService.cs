@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,58 +11,61 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chords.WebApi.GraphQl.Genres
 {
-    public class GenreService : BaseService
+    public class GenreService : BaseService<Genre>
     {
         private readonly IMapper _mapper;
-        private readonly ChordsDbContext _dbContext;
-        
-        public GenreService(IMapper mapper, IHttpContextAccessor httpContextAccessor, IDbContextFactory<ChordsDbContext> dbContextFactory) : base(httpContextAccessor, dbContextFactory)
+
+        public GenreService(IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
+            IDbContextFactory<ChordsDbContext> dbContextFactory) : base(mapper, httpContextAccessor, dbContextFactory)
         {
             _mapper = mapper;
-            _dbContext = dbContextFactory.CreateDbContext();
         }
         
         public Task<IQueryable<Genre>> GetGenres()
         {
-            return Task.FromResult(_dbContext.Genres.AsQueryable());
+            return Task.FromResult(DbContext.Genres.AsQueryable());
+        }
+        
+        public Task<Genre> GetGenre(object id)
+        {
+            return Task.FromResult(DbContext.Genres.Find(id));
         }
 
+        public Task<IQueryable<Genre>> GetGenresByIds(IReadOnlyList<object> ids)
+        {
+            return Task.FromResult(DbContext.Genres.Where(_ => ids.Contains(_.Id)));
+        }
+        
         public async Task<Genre> CreateGenre(AddGenreInput addGenreInput)
         {
-            Genre genre = _mapper.Map<Genre>(addGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Genre genre = await PreCreate(addGenreInput);
             
-            var entityEntry = await _dbContext.AddAsync(genre);
+            var entityEntry = await DbContext.AddAsync(genre);
 
-            await _dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return entityEntry.Entity;
         }
 
         public async Task<Genre> UpdateGenre(EditGenreInput editGenreInput)
         {
-            Genre genre = _mapper.Map<Genre>(editGenreInput);
-            genre.UpdatedBy = GetCurrentUserId();
+            Genre genre = await PreUpdate(editGenreInput);
             
-            var entityEntry = _dbContext.Update(genre);
+            var entityEntry = DbContext.Update(genre);
 
-            await _dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
             
             return entityEntry.Entity;
         }
 
         public async Task<Genre> RemoveGenre(object id)
         {
-            Genre genre = new Genre
-            {
-                Id = $"{id}",
-                IsDeleted = true,
-                UpdatedBy = GetCurrentUserId()
-            };
+            Genre genre = await PreRemove(id);
 
-            var entityEntry = _dbContext.Remove(genre);
+            var entityEntry = DbContext.Remove(genre);
             
-            await _dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
             
             return entityEntry.Entity;
         }
