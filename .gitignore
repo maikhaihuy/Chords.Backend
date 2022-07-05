@@ -1,0 +1,7 @@
+Chords.CoreLib/bin/
+Chords.CoreLib/obj/
+Chords.DataAccess/bin/
+Chords.DataAccess/obj/
+Chords.WebApi/bin/
+Chords.WebApi/obj/
+.idea/
